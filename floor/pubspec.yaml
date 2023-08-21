@@ -4,7 +4,7 @@ description: >
   This library is the runtime dependency.
 version: 1.4.2
 homepage: https://pinchbv.github.io/floor/
-repository: https://github.com/pinchbv/floor
+repository: https://github.com/Ideaslab-HK/floor
 issue_tracker: https://github.com/pinchbv/floor/issues
 publish_to: none
 
