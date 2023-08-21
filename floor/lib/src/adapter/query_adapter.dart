@@ -36,6 +36,8 @@ class QueryAdapter {
     return mapper(rows.first);
   }
 
+  static int queryListCount = 0;
+
   /// Executes a SQLite query that may return multiple values.
   Future<List<T>> queryList<T>(
     final String sql, {
@@ -44,11 +46,19 @@ class QueryAdapter {
   }) async {
     final rootNode = _parseRootNode(sql);
 
+    queryListCount++;
+    var c = queryListCount;
+    print('queryList before $c: $sql');
+
     if (rootNode is SelectStatement) {
       return _database
           .rawQuery(sql, arguments)
-          .then((rows) => rows.map((row) => mapper(row)).toList());
+          .then((rows) {
+            print('queryList after $c: $sql');
+            return rows.map((row) => mapper(row)).toList();
+          });          
     } else {
+      print('queryList error $c: $sql');
       throw StateError(
           'Unsupported query "$sql" for List return type. It should be SELECT, since DELETE, UPDATE, INSERT returns `int` type.');
     }
@@ -129,6 +139,8 @@ class QueryAdapter {
     return controller.stream;
   }
 
+  static int queryCount = 0;
+
   /// Parses the SQL query to determine which method is declared and executes it.
   Future<List<Map<String, Object?>>> _preformQuery(
     String sql,
@@ -137,6 +149,10 @@ class QueryAdapter {
     List<Map<String, Object?>> result = List.empty();
     String tableName = '';
     final rootNode = _parseRootNode(sql);
+
+    queryCount++;
+    var c = queryCount;
+    print("_performQuery $c before: $sql");
 
     if (rootNode is SelectStatement) {
       result = await _database.rawQuery(sql, arguments);
@@ -150,6 +166,8 @@ class QueryAdapter {
       result = await _database.rawDelete(sql, arguments).then(_mapResult);
       tableName = rootNode.table.tableName;
     }
+
+    print("_performQuery $c after: $sql");
 
     _notifyIfChanged(tableName, result);
 
