@@ -75,7 +75,9 @@ class QueryAdapter {
     final controller = StreamController<T?>.broadcast();
 
     Future<void> executeQueryAndNotifyController() async {
-      final result = await query(sql, arguments: arguments, mapper: mapper);
+      final result = await query(sql, arguments: arguments, mapper: mapper).catchError((error) {
+        controller.addError(error);
+      });
       controller.add(result);
     }
 
@@ -109,7 +111,9 @@ class QueryAdapter {
     final controller = StreamController<List<T>>.broadcast();
 
     Future<void> executeQueryAndNotifyController() async {
-      final result = await queryList(sql, arguments: arguments, mapper: mapper);
+      final result = await queryList(sql, arguments: arguments, mapper: mapper).catchError((error) {
+        controller.addError(error);
+      });
       controller.add(result);
     }
 
